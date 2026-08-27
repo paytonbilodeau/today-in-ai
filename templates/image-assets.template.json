@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "hook": "TWO TO FIVE WORDS",
+  "visual_source": {
+    "kind": "established_meme",
+    "production_route": "reference_generation",
+    "name": "Recognizable meme name",
+    "family": "normalized meme family",
+    "source_page_url": "https://authoritative-or-original-source.example/page",
+    "asset_url": "https://authoritative-or-original-source.example/asset",
+    "asset_path": "today-in-ai/images/YYYY-MM-DD/assets/source-image.ext",
+    "asset_sha256": "replace-with-lowercase-sha256",
+    "usage_note": "Describe the source, transformation, and rights or editorial-use basis without overstating permission.",
+    "recognizable_traits": [
+      "pose or crop",
+      "expression",
+      "object relationship"
+    ],
+    "why_generated_original": ""
+  },
+  "composition": {
+    "main_composition": "One concise description",
+    "subject_pose": "One concise description",
+    "prop_setup": "One concise description",
+    "visual_joke": "One concise description"
+  },
+  "typography": {
+    "font": "Instrument Sans ExtraBold",
+    "weight": 800,
+    "primary_color": "#FFFFFF",
+    "accent_color": "#72DFA5",
+    "dominant_phrase": "DOMINANT WORDS",
+    "outline_or_shadow": "Describe the high-contrast edge treatment"
+  },
+  "palette": {
+    "name": "AI Mentorship",
+    "jet_black": "#0B0F0D",
+    "old_money_green": "#0F583D",
+    "mint_green": "#72DFA5",
+    "warm_paper": "#F7F8F4",
+    "white": "#FFFFFF",
+    "source_color_exceptions": "Natural skin tones, recognizable source-meme colors, and exact official logo colors only."
+  },
+  "publication_mark": {
+    "asset_path": "today-in-ai/brand/selected/today-in-ai-logo-white-transparent.png",
+    "placement": "bottom-left",
+    "treatment": "fixed-series-badge",
+    "safe_margin_px": 84,
+    "width_percent": 12,
+    "canvas_width_px": 1920,
+    "canvas_height_px": 1080,
+    "left_px": 84,
+    "bottom_px": 84,
+    "width_px": 230,
+    "transparent": true,
+    "applied_by": "execution/today_in_ai_badge.py"
+  },
+  "deterministic_composite": {
+    "exact_text_added_after_generation": true,
+    "badge_added_after_generation": true,
+    "logo_fidelity_verified": true,
+    "badge_zone_reserved": true
+  },
+  "logos": [
+    {
+      "brand": "Company or product",
+      "official_source_url": "https://company.example/brand",
+      "asset_path": "today-in-ai/images/YYYY-MM-DD/assets/official-logo.ext",
+      "asset_sha256": "replace-with-lowercase-sha256",
+      "surface": "Device screen, sign, product casing, or other planned surface",
+      "integration": "Perspective, lighting, texture, reflection, grain, edge softness, and occlusion plan"
+    }
+  ]
+}
