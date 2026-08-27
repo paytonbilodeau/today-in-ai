@@ -7,6 +7,26 @@ Live output, every day:
 - LinkedIn: [linkedin.com/in/paytonbilodeau](https://www.linkedin.com/in/paytonbilodeau)
 - X: [x.com/paytonbilodeau](https://x.com/paytonbilodeau)
 
+## What it looks like
+
+Every edition is one link-free post and one original 1920 by 1080 image, identical on both platforms. This is the August 27, 2026 edition, researched, written, illustrated, published, and verified by the system:
+
+![August 27, 2026 edition image](assets/example-edition.png)
+
+> Nvidia's $96 Billion Quarter:
+>
+> Nvidia made $96.2 billion in three months, more than double its revenue from the same quarter last year.
+>
+> [...]
+>
+> The AI gold rush has found the hardware store, and it is ordering by the million.
+>
+> [...]
+>
+> AI is no longer only a software story.
+>
+> It is becoming one of the largest physical construction and equipment cycles in technology history.
+
 ## What a daily run does
 
 1. Reviews its own last seven editions so it never repeats a story angle, heading, joke structure, meme family, or image composition. A deterministic novelty check blocks publishing if it does.

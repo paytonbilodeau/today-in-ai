@@ -34,7 +34,7 @@ As of August 15, 2026:
 - Payton subscribed that address to AI newsletters beginning August 5. Current recurring editorial sources include TLDR AI, The AI Brief, The Rundown AI, The Neuron, Superhuman, There's An AI For That, The AI Daily Brief, Morning Brew's AI coverage, Ben's Bites, Marcus on AI, and AI with Remy. AI with Remy is verified in the inbox at `remy@mail.aiwithremy.com`. The list is a starting registry, not a closed allowlist.
 - TLDR AI's current message requests signup confirmation. Treat its subscription as pending until regular editions appear.
 - Use the connected Gmail app for Today in AI intake. Do not depend on the workspace multi-account Gmail script.
-- Keep both Google accounts connected: `hi@paytonbilodeau.com` for Today in AI newsletter discovery and `payton@iphonephotographyschool.com` for AI Lab work. Today in AI no longer depends on the work inbox for its newsletter intake.
+- Keep `hi@paytonbilodeau.com` connected for Today in AI newsletter discovery. Today in AI depends on no other inbox for its newsletter intake.
 - Postiz authentication and Payton's LinkedIn and X integration aliases exist. Recheck them before posting and after any failure.
 
 Never place Gmail or Postiz credentials in the workspace.
