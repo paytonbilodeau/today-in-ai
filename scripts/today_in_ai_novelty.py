@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 
-WORKSPACE = Path("/Users/paytonbilodeau/Documents/Business Vibe Coding")
+WORKSPACE = Path("~/workspace").expanduser()
 WINDOW_DAYS = 7
 COPY_SIMILARITY_LIMIT = 0.52
 WORD_RE = re.compile(r"[a-z0-9]+")

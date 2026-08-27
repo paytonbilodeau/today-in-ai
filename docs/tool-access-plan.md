@@ -37,7 +37,7 @@ A browser may inspect or verify a delayed Postiz result. It may not create, edit
 
 The novelty review reads only the seven previous dated workspace editions and their final images. The asset validator reads only dated source files, official logo files, hashes, source URLs, the exact AI Mentorship palette, the production route, and the publication mark. The badge script applies the transparent master at locked geometry with local FFmpeg. None of these local checks requires a paid service or external database.
 
-The retention script may move only exact `Today in AI - YYYY-MM-DD` directories under `~/Desktop/Leverage/Today in AI/` to macOS Trash. It may run only after LinkedIn and X are both verified and only when its 14-day state gate is due. It must not touch the workspace audit history.
+The retention script may move only exact `Today in AI - YYYY-MM-DD` directories under `~/Desktop/Today in AI/` to macOS Trash. It may run only after LinkedIn and X are both verified and only when its 14-day state gate is due. It must not touch the workspace audit history.
 
 ## Secret Handling
 

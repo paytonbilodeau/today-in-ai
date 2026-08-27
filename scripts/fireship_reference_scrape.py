@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 
-WORKSPACE = Path("/Users/paytonbilodeau/Documents/Business Vibe Coding")
+WORKSPACE = Path("~/workspace").expanduser()
 DEFAULT_OUTPUT = WORKSPACE / "youtube" / "fireship-today-in-ai-library" / "data"
 DEFAULT_CHANNEL = "https://www.youtube.com/@Fireship"
 TAG_RE = re.compile(r"<[^>]+>")

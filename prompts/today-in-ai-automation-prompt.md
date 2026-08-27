@@ -18,7 +18,7 @@ Run when the standalone ChatGPT desktop scheduled task starts or when Payton ask
 
 # INPUTS TO CHECK
 
-Work inside `/Users/paytonbilodeau/Documents/Business Vibe Coding`.
+Work inside `~/workspace`.
 
 Read these files completely before working:
 
@@ -39,7 +39,7 @@ Read these files completely before working:
 15. `.agents/skills/no-ai-slop/SKILL.md`
 16. `.agents/skills/no-ai-slop/eval.md`
 17. `.agents/skills/social-publisher/SKILL.md`
-18. `/Users/paytonbilodeau/.codex/skills/.system/imagegen/SKILL.md`
+18. `~/.codex/skills/.system/imagegen/SKILL.md`
 19. `.agents/skills/today-in-ai-thumbnail/SKILL.md`
 20. `youtube/fireship-today-in-ai-library/00-INDEX.md`
 21. `youtube/fireship-today-in-ai-library/02-writing-mechanics.md`
@@ -161,7 +161,7 @@ Do not use an AI-generated generic person in place of a recognizable established
 
 # OUTPUT DESTINATION
 
-Save the edition, sources, rolling seven-day review, image prompt, image asset manifest, sourced assets, image, manifests, and results in the dated workspace folders. Copy the complete package to `~/Desktop/Leverage/Today in AI/Today in AI - <YYYY-MM-DD>/`.
+Save the edition, sources, rolling seven-day review, image prompt, image asset manifest, sourced assets, image, manifests, and results in the dated workspace folders. Copy the complete package to `~/Desktop/Today in AI/Today in AI - <YYYY-MM-DD>/`.
 
 Keep the canonical workspace editions, images, logs, manifests, results, and receipts. The biweekly cleanup applies only to dated Desktop delivery copies and uses macOS Trash so recovery remains possible.
 

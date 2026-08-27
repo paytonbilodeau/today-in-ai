@@ -20,8 +20,8 @@ except ModuleNotFoundError:
     from execution.today_in_ai_novelty import build_review, write_review
 
 
-WORKSPACE = Path("/Users/paytonbilodeau/Documents/Business Vibe Coding")
-DEFAULT_DELIVERY_ROOT = Path("/Users/paytonbilodeau/Desktop/Leverage/Today in AI")
+WORKSPACE = Path("~/workspace").expanduser()
+DEFAULT_DELIVERY_ROOT = Path("~/Desktop/Today in AI").expanduser()
 ASSET_MANIFEST_REQUIRED_FROM = date(2026, 7, 29)
 ADAPTIVE_EDITORIAL_REQUIRED_FROM = date(2026, 8, 7)
 LINK_FREE_PUBLIC_COPY_REQUIRED_FROM = date(2026, 8, 25)

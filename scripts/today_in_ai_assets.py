@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-WORKSPACE = Path("/Users/paytonbilodeau/Documents/Business Vibe Coding")
+WORKSPACE = Path("~/workspace").expanduser()
 TODAY_MARK = "today-in-ai/brand/selected/today-in-ai-logo-white-transparent.png"
 AI_MENTORSHIP_PALETTE = {
     "jet_black": "#0B0F0D",

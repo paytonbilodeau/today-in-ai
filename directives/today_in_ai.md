@@ -369,7 +369,7 @@ python3 execution/today_in_ai_novelty.py --date <YYYY-MM-DD> --write --check
 
 21. If the check fails, revise the copy, image plan, or final image and run it again. Do not package or publish a failed candidate.
 22. Record the human visual judgment in `recent-seven-review.md` and `package.md`.
-23. Copy the complete daily package to `~/Desktop/Leverage/Today in AI/Today in AI - <YYYY-MM-DD>/`.
+23. Copy the complete daily package to `~/Desktop/Today in AI/Today in AI - <YYYY-MM-DD>/`.
 
 Image QA:
 
@@ -547,11 +547,11 @@ Do not ask for a second publishing confirmation after a scheduled run starts or 
 The former launchd scheduler was installed July 23, 2026, hardened July 24, and retired July 25. It remains retired. The approved replacement is the active ChatGPT desktop scheduled task.
 
 - Former label: `com.paytonbilodeau.today-in-ai`
-- Installed plist: removed from `/Users/paytonbilodeau/Library/LaunchAgents/`
+- Installed plist: removed from `~/Library/LaunchAgents/`
 - Retained source plist: `execution/launchd/com.paytonbilodeau.today-in-ai.plist`
 - Retained runner: `execution/today_in_ai_runner.sh`
 - Retained production prompt: `automations/today-in-ai/today-in-ai-automation-prompt.md`
-- Historical logs: `/Users/paytonbilodeau/Library/Logs/Today in AI/`
+- Historical logs: `~/Library/Logs/Today in AI/`
 - Previous schedules: 8:00 AM primary run and 9:20 AM recovery run
 
 The retained runner exits safely when called without arguments. Its production path requires the explicit `--run-retired` flag. Do not reinstall, bootstrap, or otherwise reactivate launchd unless Payton explicitly asks to replace the ChatGPT desktop scheduled task with the legacy scheduler.

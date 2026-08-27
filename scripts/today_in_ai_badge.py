@@ -10,7 +10,7 @@ import subprocess
 from pathlib import Path
 
 
-WORKSPACE = Path("/Users/paytonbilodeau/Documents/Business Vibe Coding")
+WORKSPACE = Path("~/workspace").expanduser()
 DEFAULT_MARK = (
     WORKSPACE
     / "today-in-ai/brand/selected/today-in-ai-logo-white-transparent.png"

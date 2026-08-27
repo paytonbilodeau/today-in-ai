@@ -7,7 +7,7 @@ Keep its current schedule, timezone, project, model, reasoning setting, active s
 Replace the scheduled-run instructions with the following:
 
 ```text
-Run directly in `/Users/paytonbilodeau/Documents/Business Vibe Coding`. This is a standalone scheduled run and must put the complete result in this run's new chat.
+Run directly in `~/workspace`. This is a standalone scheduled run and must put the complete result in this run's new chat.
 
 1. Determine the current date in `America/New_York`.
 2. Read `AGENTS.md` and `automations/today-in-ai/today-in-ai-automation-prompt.md` completely. The shared prompt is authoritative.
@@ -25,7 +25,7 @@ Run directly in `/Users/paytonbilodeau/Documents/Business Vibe Coding`. This is 
 14. Treat this scheduled run as Payton's authorization to publish immediately after every required gate passes. Use the same exact copy and image on LinkedIn and X, publish each platform separately through `execution/social_publisher.py` and Postiz, and verify state, release ID, live URL, attached image, and receipt.
 15. Write `publish-results.json` with verified LinkedIn and X platform records. Mark the run published only after both destinations are verified. Append the complete result to `today-in-ai/log.md` and copy the updated package and results into the dated Desktop delivery folder.
 16. If any accuracy, source, importance-ranking, novelty, asset, image, account-routing, Postiz, publishing, or verification gate fails, preserve the dated package, append the exact failure and repair step to `today-in-ai/log.md`, and stop without switching routes.
-17. Only after LinkedIn and X are both verified as published, run the 14-day retention gate. It may move only dated delivery folders outside the current seven-day window from `~/Desktop/Leverage/Today in AI/` to macOS Trash. Never remove workspace editions, images, logs, manifests, results, or receipts.
+17. Only after LinkedIn and X are both verified as published, run the 14-day retention gate. It may move only dated delivery folders outside the current seven-day window from `~/Desktop/Today in AI/` to macOS Trash. Never remove workspace editions, images, logs, manifests, results, or receipts.
 18. Report the complete result in the scheduled-run chat, including the scored candidate slate and why the lead won, final copy, image path, delivery folder, asset and novelty results, retention result, both live URLs, and both verified platform states.
 
 Do not open or publish to YouTube. Do not reinstall or invoke the retired launchd scheduler. Do not create a second recovery schedule.

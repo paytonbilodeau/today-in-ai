@@ -11,11 +11,11 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 
-DEFAULT_DELIVERY_ROOT = Path("/Users/paytonbilodeau/Desktop/Leverage/Today in AI")
+DEFAULT_DELIVERY_ROOT = Path("~/Desktop/Today in AI").expanduser()
 DEFAULT_STATE_FILE = Path(
-    "/Users/paytonbilodeau/Documents/Business Vibe Coding/"
+    "~/workspace/"
     "today-in-ai/retention-state.json"
-)
+).expanduser()
 DEFAULT_TRASH_ROOT = Path.home() / ".Trash"
 FOLDER_RE = re.compile(r"^Today in AI - (\d{4}-\d{2}-\d{2})$")
 KEEP_DAYS = 7
