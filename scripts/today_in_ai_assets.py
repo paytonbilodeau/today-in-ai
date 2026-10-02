@@ -77,7 +77,9 @@ def resolve_asset(workspace: Path, value: object, label: str) -> tuple[Path, str
     relative = Path(raw)
     if relative.is_absolute() or ".." in relative.parts:
         raise AssetManifestError(f"{label} must be a workspace-relative path")
-    resolved = workspace / relative
+    resolved = (workspace / relative).resolve()
+    if not resolved.is_relative_to(workspace.resolve()):
+        raise AssetManifestError(f"{label} must stay inside the workspace")
     if not resolved.is_file():
         raise AssetManifestError(f"{label} does not exist: {raw}")
     return resolved, raw

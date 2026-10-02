@@ -1,5 +1,7 @@
 # Today in AI
 
+[![Repository quality](https://github.com/paytonbilodeau/today-in-ai/actions/workflows/quality.yml/badge.svg)](https://github.com/paytonbilodeau/today-in-ai/actions/workflows/quality.yml)
+
 An automated daily AI news brief that researches, verifies, writes, illustrates, and publishes itself to my LinkedIn and X every morning.
 
 Live output, every day:

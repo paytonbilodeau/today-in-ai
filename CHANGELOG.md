@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 2026-10-02
+
+Add repository quality checks and security reporting guidance. Reject asset symlinks that escape the workspace and restrict channel catalog input to HTTPS YouTube URLs. End command options before passing the URL to yt-dlp. Add offline regression coverage for these boundaries.
+
 ## 1.1.0 - 2026-10-02
 
 Use schema 3 for generated text and style-matched logos in one scene. Add current
