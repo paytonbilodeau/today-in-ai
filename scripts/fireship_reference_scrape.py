@@ -21,6 +21,7 @@ import tempfile
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 WORKSPACE = Path("~/workspace").expanduser()
@@ -214,11 +215,15 @@ def compact_raw_sources(output: Path, selected: list[dict[str, object]]) -> None
 
 
 def flat_catalog(channel: str, yt_dlp: str) -> list[dict[str, object]]:
+    parsed = urlparse(channel)
+    if parsed.scheme != "https" or parsed.hostname not in {"youtube.com", "www.youtube.com", "m.youtube.com"} or parsed.username or parsed.password:
+        raise ValueError("Channel must be an HTTPS YouTube URL without credentials.")
     command = [
         yt_dlp,
         "--flat-playlist",
         "--dump-json",
         "--ignore-errors",
+        "--",
         f"{channel.rstrip('/')}/videos",
     ]
     result = run(command)
