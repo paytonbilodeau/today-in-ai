@@ -196,6 +196,10 @@ def edition_snapshot(workspace: Path, edition_date: date) -> dict | None:
             results = {}
     images = sorted(image_dir.glob("*final.png"))
     image_path = images[0] if images else None
+    # A live-post recovery preserves the provider JPEG when the master is lost.
+    recovered_image = image_dir / "recovered-live-image.jpg"
+    if image_path is None and recovered_image.is_file():
+        image_path = recovered_image
     meme = extract_meme(package, prompt)
     visual_concept = extract_visual_concept(prompt)
     asset_manifest = load_asset_manifest(edition_dir)

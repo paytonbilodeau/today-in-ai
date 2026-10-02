@@ -1,3 +1,9 @@
+# Current policy, October 2, 2026
+
+Use the version-1.1.0 production packet for new runs. It supersedes historical
+badge overlays, private workspace references and parallel destination submission
+below. New images use schema 3; X is submitted and verified before LinkedIn.
+
 # Today in AI Iteration Log
 
 ## 2026-08-26 LinkedIn And X Only

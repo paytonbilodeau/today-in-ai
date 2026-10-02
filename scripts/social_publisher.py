@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Any
 
 
-SCRIPT_VERSION = "0.3.0"
+SCRIPT_VERSION = "0.3.1"
 POSTIZ_VERSION = "2.0.15"
 VIDEO_EXTENSIONS = {".mp4", ".mov"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
@@ -728,6 +728,13 @@ def validate_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
                 )
         if name == "x" and target.get("who_can_reply", "everyone") not in X_REPLY_OPTIONS:
             errors.append("targets.x.who_can_reply is invalid")
+        if name == "x" and manifest.get("publication") == "today-in-ai":
+            if target.get("thread_policy") != "single":
+                errors.append("Today in AI requires targets.x.thread_policy single")
+            if target.get("method", "postiz") != "postiz":
+                errors.append("Today in AI X requires the Postiz route")
+            if workflow != "image" or len(images) != 1:
+                errors.append("Today in AI X requires exactly one image")
 
     resolved, followups = resolve_methods(manifest, info)
     if info:
@@ -864,6 +871,9 @@ def render_postiz_payload(
                 "Use TikTok's logged-in browser uploader. A self-hosted, unaudited TikTok client can only Direct Post as SELF_ONLY."
             )
             continue
+        if name == "x" and manifest.get("publication") == "today-in-ai":
+            if target.get("thread_policy") != "single":
+                raise PublisherError("Today in AI requires a single X post; refusing a thread")
         alias = integration_alias(name, target)
         integration_id = integrations.get(alias)
         if not integration_id or str(integration_id).startswith("REPLACE_"):
@@ -933,30 +943,37 @@ def render_postiz_payload(
     )
 
 
-def canonical_fingerprint(manifest: dict[str, Any]) -> str:
+def media_source_hashes(manifest: dict[str, Any]) -> dict[str, Any]:
+    """Hash every local media input before an external mutation."""
+    media = manifest.get("media", {})
+    result: dict[str, Any] = {}
+
+    def fingerprint(raw_path: Any) -> dict[str, Any]:
+        path = Path(str(raw_path)).expanduser().resolve()
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(4 * 1024 * 1024), b""):
+                digest.update(chunk)
+        return {"path": str(path), "bytes": path.stat().st_size, "sha256": digest.hexdigest()}
+
+    for key in ("video", "thumbnail"):
+        if media.get(key):
+            result[key] = fingerprint(media[key])
+    result["platform_videos"] = {
+        platform: fingerprint(raw_path)
+        for platform, raw_path in sorted(media.get("platform_videos", {}).items())
+    }
+    result["images"] = [fingerprint(raw_path) for raw_path in media.get("images", [])]
+    return result
+
+
+def canonical_fingerprint(
+    manifest: dict[str, Any], *, source_hashes: dict[str, Any] | None = None
+) -> str:
     digest = hashlib.sha256()
     digest.update(json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode("utf-8"))
-    media = manifest.get("media", {})
-    for key in ("video", "thumbnail"):
-        raw_path = media.get(key)
-        if not raw_path:
-            continue
-        path = Path(str(raw_path)).expanduser().resolve()
-        if path.exists():
-            stat_result = path.stat()
-            digest.update(f"{path}:{stat_result.st_size}:{stat_result.st_mtime_ns}".encode("utf-8"))
-    for platform, raw_path in sorted(media.get("platform_videos", {}).items()):
-        path = Path(str(raw_path)).expanduser().resolve()
-        if path.exists():
-            stat_result = path.stat()
-            digest.update(
-                f"{platform}:{path}:{stat_result.st_size}:{stat_result.st_mtime_ns}".encode("utf-8")
-            )
-    for raw_path in media.get("images", []):
-        path = Path(str(raw_path)).expanduser().resolve()
-        if path.exists():
-            stat_result = path.stat()
-            digest.update(f"{path}:{stat_result.st_size}:{stat_result.st_mtime_ns}".encode("utf-8"))
+    hashes = source_hashes if source_hashes is not None else media_source_hashes(manifest)
+    digest.update(json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode("utf-8"))
     return digest.hexdigest()
 
 
@@ -1001,10 +1018,14 @@ def submit_manifest(manifest_path: Path, mode: str, confirm_upload: bool, confir
     if mode == "schedule" and not manifest.get("publish_at"):
         raise PublisherError("Scheduled publishing requires publish_at in the manifest")
 
-    fingerprint = canonical_fingerprint(manifest)
+    source_hashes = media_source_hashes(manifest)
+    fingerprint = canonical_fingerprint(manifest, source_hashes=source_hashes)
     receipt_path = RECEIPTS_DIR / f"{fingerprint}.json"
-    if receipt_path.exists() and not force:
-        raise PublisherError(f"This manifest was already submitted. Receipt: {receipt_path}")
+    if receipt_path.exists():
+        raise PublisherError(
+            "An existing submission journal blocks retry. Reconcile its original upload/post IDs "
+            f"and the native destination before any new submission: {receipt_path}"
+        )
 
     account_map = load_account_map()
     render_postiz_payload(
@@ -1032,41 +1053,86 @@ def submit_manifest(manifest_path: Path, mode: str, confirm_upload: bool, confir
     if "Credentials are valid" not in auth.stdout:
         raise PublisherError("Postiz is not authenticated. Run: npx postiz@2.0.15 auth:login")
 
-    uploads: dict[str, Any] = {}
-    for key in ("video", "thumbnail"):
-        raw_path = manifest.get("media", {}).get(key)
-        if not raw_path:
-            continue
-        result = run_postiz(["upload", str(Path(raw_path).expanduser().resolve())])
-        uploads[key] = extract_json(result.stdout)
-    uploads["platform_videos"] = {}
-    for platform, raw_path in manifest.get("media", {}).get("platform_videos", {}).items():
-        result = run_postiz(["upload", str(Path(raw_path).expanduser().resolve())])
-        uploads["platform_videos"][platform] = extract_json(result.stdout)
-    uploads["images"] = []
-    for raw_path in manifest.get("media", {}).get("images", []):
-        result = run_postiz(["upload", str(Path(raw_path).expanduser().resolve())])
-        uploads["images"].append(extract_json(result.stdout))
-
-    payload, followups = render_postiz_payload(manifest, account_map, uploads, mode=mode)
-    with tempfile.NamedTemporaryFile("w", suffix=".json", encoding="utf-8", delete=False) as handle:
-        json.dump(payload, handle, ensure_ascii=False)
-        payload_path = Path(handle.name)
-    try:
-        created = run_postiz(["posts:create", "--json", str(payload_path)])
-        created_payload = extract_json(created.stdout)
-    finally:
-        payload_path.unlink(missing_ok=True)
-
+    started_at = datetime.now(timezone.utc).isoformat()
     receipt = {
         "schema_version": 1,
+        "backend": "postiz",
         "fingerprint": fingerprint,
-        "submitted_at": datetime.now(timezone.utc).isoformat(),
+        "started_at": started_at,
+        "updated_at": started_at,
         "mode": mode,
         "manifest": str(manifest_path.expanduser().resolve()),
-        "postiz_result": created_payload,
-        "browser_followups": followups,
+        "manifest_sha256": hashlib.sha256(
+            manifest_path.expanduser().read_bytes()
+        ).hexdigest(),
+        "source_media": source_hashes,
+        "status": "pending_upload",
+        "mutation_started": False,
+        "uploads": {},
+        "payload": None,
+        "postiz_result": None,
+        "browser_followups": [],
+        "native_verification": {"status": "pending"},
     }
+    write_private_json(receipt_path, receipt)
+
+    uploads: dict[str, Any] = {}
+    try:
+        receipt["status"] = "uploading"
+        receipt["mutation_started"] = True
+        receipt["updated_at"] = datetime.now(timezone.utc).isoformat()
+        write_private_json(receipt_path, receipt)
+        for key in ("video", "thumbnail"):
+            raw_path = manifest.get("media", {}).get(key)
+            if not raw_path:
+                continue
+            result = run_postiz(["upload", str(Path(raw_path).expanduser().resolve())])
+            uploads[key] = extract_json(result.stdout)
+            receipt["uploads"] = uploads
+            receipt["updated_at"] = datetime.now(timezone.utc).isoformat()
+            write_private_json(receipt_path, receipt)
+        uploads["platform_videos"] = {}
+        for platform, raw_path in manifest.get("media", {}).get("platform_videos", {}).items():
+            result = run_postiz(["upload", str(Path(raw_path).expanduser().resolve())])
+            uploads["platform_videos"][platform] = extract_json(result.stdout)
+            receipt["uploads"] = uploads
+            receipt["updated_at"] = datetime.now(timezone.utc).isoformat()
+            write_private_json(receipt_path, receipt)
+        uploads["images"] = []
+        for raw_path in manifest.get("media", {}).get("images", []):
+            result = run_postiz(["upload", str(Path(raw_path).expanduser().resolve())])
+            uploads["images"].append(extract_json(result.stdout))
+            receipt["uploads"] = uploads
+            receipt["updated_at"] = datetime.now(timezone.utc).isoformat()
+            write_private_json(receipt_path, receipt)
+
+        payload, followups = render_postiz_payload(manifest, account_map, uploads, mode=mode)
+        receipt["status"] = "pending_create"
+        receipt["payload"] = payload
+        receipt["browser_followups"] = followups
+        receipt["updated_at"] = datetime.now(timezone.utc).isoformat()
+        write_private_json(receipt_path, receipt)
+        with tempfile.NamedTemporaryFile("w", suffix=".json", encoding="utf-8", delete=False) as handle:
+            json.dump(payload, handle, ensure_ascii=False)
+            payload_path = Path(handle.name)
+        try:
+            created = run_postiz(["posts:create", "--json", str(payload_path)])
+            created_payload = extract_json(created.stdout)
+        finally:
+            payload_path.unlink(missing_ok=True)
+    except PublisherError as exc:
+        receipt["status"] = "uncertain"
+        receipt["updated_at"] = datetime.now(timezone.utc).isoformat()
+        receipt["last_error"] = str(exc)[:2000]
+        write_private_json(receipt_path, receipt)
+        raise PublisherError(
+            f"{exc}. Submission state is uncertain; reconcile the journal before retrying: {receipt_path}"
+        ) from exc
+
+    receipt["status"] = "provider_accepted"
+    receipt["submitted_at"] = datetime.now(timezone.utc).isoformat()
+    receipt["updated_at"] = receipt["submitted_at"]
+    receipt["postiz_result"] = created_payload
     write_private_json(receipt_path, receipt)
     return {"ok": True, "receipt": str(receipt_path), **receipt}
 
@@ -1086,6 +1152,7 @@ def doctor(online: bool) -> dict[str, Any]:
     checks["local_ready"] = bool(checks["ffprobe"] and (checks["postiz_global"] or checks["npx"]))
     checks["account_ids_ready"] = False
     checks["missing_account_aliases"] = []
+    today_in_ai_aliases_ready = False
     if checks["account_map"]:
         try:
             account_map = load_account_map()
@@ -1100,17 +1167,30 @@ def doctor(online: bool) -> dict[str, Any]:
             )
             checks["missing_account_aliases"] = missing_aliases
             checks["account_ids_ready"] = not required_aliases.intersection(missing_aliases)
+            today_in_ai_aliases_ready = all(
+                integrations.get(alias) and not str(integrations[alias]).startswith("REPLACE_")
+                for alias in ("x", "linkedin")
+            )
         except PublisherError as exc:
             checks["account_map_error"] = str(exc)
     checks["configured"] = bool(checks["account_ids_ready"] and checks["postiz_credentials"])
+    checks["postiz_today_in_ai_configured"] = bool(
+        today_in_ai_aliases_ready and checks["postiz_credentials"]
+    )
     if online:
         try:
+            if not checks["postiz_today_in_ai_configured"] and not checks["configured"]:
+                raise PublisherError("Postiz account aliases and credentials are required")
             version = run_postiz(["--version"])
             checks["postiz_version"] = version.stdout.strip()
             status = run_postiz(["auth:status"])
             checks["postiz_authenticated"] = "Credentials are valid" in status.stdout
         except PublisherError as exc:
+            checks["postiz_authenticated"] = False
             checks["online_error"] = str(exc)
+        checks["postiz_today_in_ai_ready"] = bool(
+            checks.get("postiz_authenticated") and checks["postiz_today_in_ai_configured"]
+        )
     return checks
 
 

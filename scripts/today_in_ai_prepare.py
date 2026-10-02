@@ -16,8 +16,8 @@ try:
     from today_in_ai_assets import AssetManifestError, validate_asset_manifest
     from today_in_ai_novelty import build_review, write_review
 except ModuleNotFoundError:
-    from execution.today_in_ai_assets import AssetManifestError, validate_asset_manifest
-    from execution.today_in_ai_novelty import build_review, write_review
+    from scripts.today_in_ai_assets import AssetManifestError, validate_asset_manifest
+    from scripts.today_in_ai_novelty import build_review, write_review
 
 
 WORKSPACE = Path("~/workspace").expanduser()
@@ -211,15 +211,18 @@ def validate_sources(sources: str) -> dict:
 
 
 def manifest(copy: str, image: Path, target: str) -> dict:
+    caption = copy.rstrip()
     target_payload: dict[str, object] = {
         "enabled": True,
         "method": "postiz",
-        "caption": copy,
+        "caption": caption,
     }
     if target == "x":
         target_payload["who_can_reply"] = "everyone"
+        target_payload["thread_policy"] = "single"
     return {
         "schema_version": 1,
+        "publication": "today-in-ai",
         "workflow": "image",
         "quality": {
             "mode": "highest_supported",
@@ -279,7 +282,6 @@ def main() -> int:
         and not asset_manifest_path.is_file()
     ):
         raise SystemExit(f"missing required edition file: {asset_manifest_path}")
-
     copy = copy_path.read_text(encoding="utf-8").rstrip() + "\n"
     copy_result = validate_copy(copy, run_date)
     sources_result = validate_sources(sources_path.read_text(encoding="utf-8"))
@@ -316,7 +318,9 @@ def main() -> int:
             manifest_previews[target] = {
                 "workflow": preview["workflow"],
                 "method": target_payload["method"],
-                "caption_matches_copy": target_payload["caption"] == copy,
+                "caption_source": "copy.txt",
+                "caption_characters": len(str(target_payload["caption"])),
+                "thread_policy": target_payload.get("thread_policy"),
                 "image": preview["media"]["images"][0],
                 "quality_mode": preview["quality"]["mode"],
             }
@@ -360,7 +364,11 @@ def main() -> int:
         if destination.exists() and not args.force:
             raise SystemExit(f"refusing to overwrite existing manifest: {destination}")
         destination.write_text(
-            json.dumps(manifest(copy, delivery_image, target), indent=2, ensure_ascii=False)
+            json.dumps(
+                manifest(copy, delivery_image, target),
+                indent=2,
+                ensure_ascii=False,
+            )
             + "\n",
             encoding="utf-8",
         )
@@ -375,6 +383,7 @@ def main() -> int:
                 "status": "ready",
                 "date": args.date,
                 "copy_words": copy_result["words"],
+                "x_post_characters": len(copy.rstrip()),
                 "story_words": copy_result["story_words"],
                 "source_url_count": sources_result["source_url_count"],
                 "asset_manifest_status": (

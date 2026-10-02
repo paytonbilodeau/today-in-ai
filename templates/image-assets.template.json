@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "hook": "TWO TO FIVE WORDS",
   "visual_source": {
     "kind": "established_meme",
@@ -39,27 +39,14 @@
     "mint_green": "#72DFA5",
     "warm_paper": "#F7F8F4",
     "white": "#FFFFFF",
-    "source_color_exceptions": "Natural skin tones, recognizable source-meme colors, and exact official logo colors only."
+    "source_color_exceptions": "Natural skin tones and recognizable source-meme colors. Render logos with the selected image style and palette treatment while preserving exact recognizable structure."
   },
   "publication_mark": {
     "asset_path": "today-in-ai/brand/selected/today-in-ai-logo-white-transparent.png",
-    "placement": "bottom-left",
-    "treatment": "fixed-series-badge",
-    "safe_margin_px": 84,
-    "width_percent": 12,
-    "canvas_width_px": 1920,
-    "canvas_height_px": 1080,
-    "left_px": 84,
-    "bottom_px": 84,
-    "width_px": 230,
-    "transparent": true,
-    "applied_by": "execution/today_in_ai_badge.py"
-  },
-  "deterministic_composite": {
-    "exact_text_added_after_generation": true,
-    "badge_added_after_generation": true,
-    "logo_fidelity_verified": true,
-    "badge_zone_reserved": true
+    "asset_sha256": "replace-with-lowercase-sha256",
+    "treatment": "style-matched-in-scene",
+    "surface": "Describe the meaningful surface carrying the publication mark",
+    "style_treatment": "Describe matching materials, texture, linework, palette treatment, light, and perspective while preserving exact recognizable structure and wording"
   },
   "logos": [
     {
@@ -68,7 +55,17 @@
       "asset_path": "today-in-ai/images/YYYY-MM-DD/assets/official-logo.ext",
       "asset_sha256": "replace-with-lowercase-sha256",
       "surface": "Device screen, sign, product casing, or other planned surface",
-      "integration": "Perspective, lighting, texture, reflection, grain, edge softness, and occlusion plan"
+      "integration": "Describe style-matched rendering and natural surface integration; verify exact recognizable structure against the official reference."
     }
-  ]
+  ],
+  "generation": {
+    "official_references_supplied": false,
+    "exact_text_integrated_in_generation": false,
+    "logos_styled_in_generation": false,
+    "logo_structure_verified": false,
+    "logo_style_match_verified": false,
+    "natural_surface_integration_verified": false,
+    "no_flat_logo_overlays": false,
+    "full_size_and_phone_size_verified": false
+  }
 }

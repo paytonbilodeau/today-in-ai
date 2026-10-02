@@ -108,8 +108,8 @@ def validate_asset_manifest(
         raise AssetManifestError(f"invalid JSON in {manifest_path}: {exc}") from exc
 
     schema_version = manifest.get("schema_version")
-    if schema_version not in {1, 2}:
-        raise AssetManifestError("schema_version must be 1 or 2")
+    if schema_version not in {1, 2, 3}:
+        raise AssetManifestError("schema_version must be 1, 2, or 3")
 
     hook = require_text(manifest.get("hook"), "hook")
     hook_words = WORD_RE.findall(hook)
@@ -128,7 +128,7 @@ def validate_asset_manifest(
     source_name = require_text(source.get("name"), "visual_source.name")
     source_family = require_text(source.get("family"), "visual_source.family")
     production_route = source.get("production_route")
-    if schema_version == 2:
+    if schema_version >= 2:
         production_route = require_text(
             production_route, "visual_source.production_route"
         )
@@ -187,7 +187,7 @@ def validate_asset_manifest(
         require_text(typography.get(field), f"typography.{field}")
 
     palette_name = None
-    if schema_version == 2:
+    if schema_version >= 2:
         palette = require_object(manifest.get("palette"), "palette")
         palette_name = require_text(palette.get("name"), "palette.name")
         if palette_name != "AI Mentorship":
@@ -207,65 +207,96 @@ def validate_asset_manifest(
         raise AssetManifestError(
             f"publication_mark.asset_path must be exactly {TODAY_MARK}"
         )
-    if mark.get("placement") != "bottom-left":
-        raise AssetManifestError("publication_mark.placement must be bottom-left")
-    if mark.get("treatment") != "fixed-series-badge":
-        raise AssetManifestError(
-            "publication_mark.treatment must be fixed-series-badge"
-        )
-    safe_margin = mark.get("safe_margin_px")
-    if not isinstance(safe_margin, int) or not 72 <= safe_margin <= 96:
-        raise AssetManifestError(
-            "publication_mark.safe_margin_px must be between 72 and 96"
-        )
-    width_percent = mark.get("width_percent")
-    if not isinstance(width_percent, (int, float)) or not 10 <= width_percent <= 14:
-        raise AssetManifestError(
-            "publication_mark.width_percent must be between 10 and 14"
-        )
-    if schema_version == 2:
-        if safe_margin != 84:
+    if schema_version == 3:
+        if mark.get("treatment") != "style-matched-in-scene":
             raise AssetManifestError(
-                "publication_mark.safe_margin_px must be exactly 84"
+                "publication_mark.treatment must be style-matched-in-scene"
             )
-        if width_percent != 12:
+        verify_hash(mark_path, mark.get("asset_sha256"), "publication_mark.asset_sha256")
+        require_text(mark.get("surface"), "publication_mark.surface")
+        require_text(mark.get("style_treatment"), "publication_mark.style_treatment")
+        generation = require_object(manifest.get("generation"), "generation")
+        for field in (
+            "official_references_supplied",
+            "exact_text_integrated_in_generation",
+            "logos_styled_in_generation",
+            "logo_structure_verified",
+            "logo_style_match_verified",
+            "natural_surface_integration_verified",
+            "no_flat_logo_overlays",
+            "full_size_and_phone_size_verified",
+        ):
+            if generation.get(field) is not True:
+                raise AssetManifestError(f"generation.{field} must be true")
+        text_integrated = True
+    else:
+        if mark.get("placement") != "bottom-left":
+            raise AssetManifestError("publication_mark.placement must be bottom-left")
+        if mark.get("treatment") != "fixed-series-badge":
             raise AssetManifestError(
-                "publication_mark.width_percent must be exactly 12"
+                "publication_mark.treatment must be fixed-series-badge"
             )
-        for field, expected in BADGE_GEOMETRY.items():
-            if mark.get(field) != expected:
+        safe_margin = mark.get("safe_margin_px")
+        if not isinstance(safe_margin, int) or not 72 <= safe_margin <= 96:
+            raise AssetManifestError(
+                "publication_mark.safe_margin_px must be between 72 and 96"
+            )
+        width_percent = mark.get("width_percent")
+        if not isinstance(width_percent, (int, float)) or not 10 <= width_percent <= 14:
+            raise AssetManifestError(
+                "publication_mark.width_percent must be between 10 and 14"
+            )
+        if schema_version == 2:
+            if safe_margin != 84:
                 raise AssetManifestError(
-                    f"publication_mark.{field} must be exactly {expected}"
+                    "publication_mark.safe_margin_px must be exactly 84"
                 )
-        if mark.get("transparent") is not True:
-            raise AssetManifestError("publication_mark.transparent must be true")
-        if mark.get("applied_by") != "execution/today_in_ai_badge.py":
-            raise AssetManifestError(
-                "publication_mark.applied_by must be execution/today_in_ai_badge.py"
-            )
+            if width_percent != 12:
+                raise AssetManifestError(
+                    "publication_mark.width_percent must be exactly 12"
+                )
+            for field, expected in BADGE_GEOMETRY.items():
+                if mark.get(field) != expected:
+                    raise AssetManifestError(
+                        f"publication_mark.{field} must be exactly {expected}"
+                    )
+            if mark.get("transparent") is not True:
+                raise AssetManifestError("publication_mark.transparent must be true")
+            if mark.get("applied_by") != "execution/today_in_ai_badge.py":
+                raise AssetManifestError(
+                    "publication_mark.applied_by must be execution/today_in_ai_badge.py"
+                )
 
-    composite = require_object(
-        manifest.get("deterministic_composite"), "deterministic_composite"
-    )
-    composite_fields = (
-        (
-            "exact_text_added_after_generation",
-            "badge_added_after_generation",
-            "logo_fidelity_verified",
-            "badge_zone_reserved",
+        composite = require_object(
+            manifest.get("deterministic_composite"), "deterministic_composite"
         )
-        if schema_version == 2
-        else (
-            "text_added_after_generation",
-            "logos_added_after_generation",
-            "model_prompt_excludes_logos",
-        )
-    )
-    for field in composite_fields:
-        if composite.get(field) is not True:
-            raise AssetManifestError(
-                f"deterministic_composite.{field} must be true"
+        composite_fields = (
+            (
+                "badge_added_after_generation",
+                "logo_fidelity_verified",
+                "badge_zone_reserved",
             )
+            if schema_version == 2
+            else (
+                "text_added_after_generation",
+                "logos_added_after_generation",
+                "model_prompt_excludes_logos",
+            )
+        )
+        for field in composite_fields:
+            if composite.get(field) is not True:
+                raise AssetManifestError(
+                    f"deterministic_composite.{field} must be true"
+                )
+        if schema_version == 2:
+            text_added = composite.get("exact_text_added_after_generation") is True
+            text_integrated = composite.get("exact_text_integrated_in_generation") is True
+            if text_added == text_integrated:
+                raise AssetManifestError(
+                    "deterministic_composite must select exactly one text route: "
+                    "exact_text_added_after_generation or "
+                    "exact_text_integrated_in_generation"
+                )
 
     logos = manifest.get("logos")
     if not isinstance(logos, list):
@@ -300,7 +331,16 @@ def validate_asset_manifest(
             prompt = prompt_path.read_text(encoding="utf-8").lower()
         except FileNotFoundError as exc:
             raise AssetManifestError(f"missing image prompt: {prompt_path}") from exc
-        if schema_version == 2:
+        if schema_version == 3:
+            required_constraints = (
+                "use the supplied reference images",
+                "preserve exact recognizable logo structure",
+                "render every logo in the same image style",
+                "integrate the today in ai mark into the scene",
+                "no flat logo overlays",
+                "#0b0f0d", "#0f583d", "#72dfa5", "#f7f8f4", "#ffffff",
+            )
+        elif schema_version == 2:
             required_constraints = (
                 "use the supplied reference images",
                 "do not invent or approximate any logo",
@@ -318,6 +358,13 @@ def validate_asset_manifest(
                 raise AssetManifestError(
                     f"image prompt must include: {required_constraint}"
                 )
+        normalized_prompt = re.sub(r"[^a-z0-9’']+", " ", prompt).strip()
+        normalized_hook = re.sub(r"[^a-z0-9’']+", " ", hook.lower()).strip()
+        if schema_version >= 2 and text_integrated and normalized_hook not in normalized_prompt:
+            raise AssetManifestError(
+                "image prompt must include the exact hook when text is integrated "
+                "during generation"
+            )
 
     return {
         "status": "pass",
