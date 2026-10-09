@@ -24,3 +24,7 @@ acceptance is separate from terminal status and independent public verification.
 No YouTube publication or missed-date replay belongs in this workflow. Keep the
 newsletter/social destinations and retention permissions explicit. Preserve the
 complete local package when a gate or tool fails and report the exact repair step.
+
+The legacy age-only retention command moves nothing. Optional cleanup follows
+verified completion and an exact reviewed file plan with retained hashes and
+restore paths. Use [the retention guide](../docs/retention.md).

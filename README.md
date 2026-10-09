@@ -43,7 +43,7 @@ A run publishes only after every gate passes: accuracy, novelty, readability, an
 
 ## How it runs
 
-The whole system is instructions plus small deterministic scripts. A scheduled agent task (Codex in the ChatGPT desktop app) reads the production packet in `prompts/`, follows the standing rules in `directives/`, and calls the Python scripts in `scripts/` for the parts that must never be left to model judgment: novelty checking, asset validation, pre-publish gating, submission journals, and authorized retention.
+The whole system is instructions plus small deterministic scripts. A scheduled agent task (Codex in the ChatGPT desktop app) reads the production packet in `prompts/`, follows the standing rules in `directives/`, and calls the Python scripts in `scripts/` for the parts that must never be left to model judgment: novelty checking, asset validation, pre-publish gating, submission journals, and a fail-closed legacy retention entry point.
 
 That split is the design opinion this repo demonstrates: the model does research, judgment, and writing; deterministic code does verification, packaging, and publishing. Trust lives in the gates, not in the model's confidence.
 
@@ -51,7 +51,7 @@ That split is the design opinion this repo demonstrates: the model does research
 
 - `prompts/` — the production packet the scheduled agent runs from, plus the prompt used to update the standing task
 - `directives/` — the standing editorial, image, and publishing rules (the system's constitution)
-- `scripts/` — the deterministic Python: novelty check, schema-3 asset validator, historical badge tool, pre-publish gate, Postiz publisher, retention cleanup, and the reference scraper for studying pacing
+- `scripts/` — the deterministic Python: novelty check, schema-3 asset validator, historical badge tool, pre-publish gate, Postiz publisher, retired age-only cleanup entry point, and the reference scraper for studying pacing
 - `context/` — accumulated context the run reads before working
 - `templates/` — the daily image brief and the image asset manifest schema
 - `docs/` — the process decomposition, the automation decision record, the maintenance plan, and the iteration log of every change to the system with the reason for it

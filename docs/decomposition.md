@@ -29,5 +29,5 @@ below. New images use schema 3; X is submitted and verified before LinkedIn.
 21. Publish LinkedIn and X separately through Postiz.
 22. Verify both Postiz results, live URLs, release IDs, receipts, and attached media.
 23. Save both Postiz receipts and both verified states in `publish-results.json` and the edition log.
-24. After both destinations are verified, run the retention check. Every 14 days it moves Desktop delivery copies older than the rolling seven-day window to Trash.
+24. After both destinations are verified, preserve compact evidence and review an optional exact-file cleanup plan using [the retention guide](retention.md). The legacy age-only command moves nothing.
 25. Run deterministic wrapper validation before reporting success.

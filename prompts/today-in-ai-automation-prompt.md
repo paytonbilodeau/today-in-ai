@@ -116,6 +116,7 @@ missing ones. This portable template has no browser-posting fallback; a creator'
 private recovery authorization is not transferable to its readers.
 
 Save copy, asset hashes, destination evidence, exact states and the next action.
-Run optional retention only after both destinations are verified and after you
-authorize its scope. The retention tool moves only dated delivery copies and
-does not erase the research archive. Report partial publication accurately.
+After both destinations are verified, preserve the compact research and publication
+record. Optional cleanup requires a separately authorized exact-file plan with
+verified retained copies, hashes and restore paths. Follow [the retention guide](../docs/retention.md).
+The legacy retention command now reports retirement and moves nothing. Report partial publication accurately.
