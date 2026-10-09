@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Move old Today in AI Desktop delivery copies to Trash every 14 days."""
+"""Retired age-only cleanup entry point; preserve files for exact-plan review."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import re
-import shutil
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -80,14 +79,7 @@ def unique_trash_destination(trash_root: Path, source: Path) -> Path:
 
 
 def apply_retention(plan: dict, trash_root: Path) -> list[dict]:
-    trash_root.mkdir(parents=True, exist_ok=True)
-    moved: list[dict] = []
-    for raw_source in plan["trash"]:
-        source = Path(raw_source)
-        destination = unique_trash_destination(trash_root, source)
-        shutil.move(str(source), str(destination))
-        moved.append({"source": str(source), "trash": str(destination)})
-    return moved
+    raise RuntimeError("Age-only cleanup is retired. Use an exact reviewed file plan with verified retained copies.")
 
 
 def write_state(path: Path, run_date: date, moved: list[dict]) -> None:
@@ -114,45 +106,12 @@ def main() -> int:
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
 
-    run_date = date.fromisoformat(args.date)
-    state = load_state(args.state_file)
-    due = cleanup_due(run_date, state)
-    plan = retention_plan(args.delivery_root, run_date)
-    moved: list[dict] = []
-
-    if args.apply and due:
-        moved = apply_retention(plan, args.trash_root)
-        write_state(args.state_file, run_date, moved)
-
-    if args.apply and due:
-        status = "applied"
-        next_due_on = (run_date + timedelta(days=CLEANUP_INTERVAL_DAYS)).isoformat()
-    elif args.apply:
-        status = "not_due"
-        last_cleanup = date.fromisoformat(state["last_cleanup_date"])
-        next_due_on = (
-            last_cleanup + timedelta(days=CLEANUP_INTERVAL_DAYS)
-        ).isoformat()
-    else:
-        status = "dry_run"
-        next_due_on = None
-
-    print(
-        json.dumps(
-            {
-                "status": status,
-                "due": due,
-                "next_due_on": next_due_on,
-                "plan": plan,
-                "moved": moved,
-                "safety": (
-                    "Only exact Today in AI - YYYY-MM-DD directories under the "
-                    "Desktop delivery root are eligible."
-                ),
-            },
-            indent=2,
-        )
-    )
+    date.fromisoformat(args.date)  # Preserve the historical date argument contract.
+    print(json.dumps({
+        "status": "retired_age_only_cleanup",
+        "moved": [],
+        "note": "No files or state were changed. After verified completion, use a separately authorized exact-file plan with retained copies, hashes and restore paths. See docs/retention.md."
+    }, indent=2))
     return 0
 
 

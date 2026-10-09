@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 - 2026-10-09
+
+Retire age-only folder cleanup. Both legacy CLI modes now leave files and state untouched, and direct apply calls reject the old plan. Document completion-based exact-file review and add preservation tests.
+
 ## 1.1.1 - 2026-10-02
 
 Add repository quality checks and security reporting guidance. Reject asset symlinks that escape the workspace and restrict channel catalog input to HTTPS YouTube URLs. End command options before passing the URL to yt-dlp. Add offline regression coverage for these boundaries.

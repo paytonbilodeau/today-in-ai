@@ -41,4 +41,4 @@ The launchd scheduler was retired July 25, 2026 because a daily request gives Pa
 - Separate platform submissions and receipts
 - Required image QA
 - Deterministic result validation after each run
-- Recoverable Desktop cleanup every 14 days while preserving the workspace audit history
+- Optional exact-file cleanup after verified completion, with retained copies and restore evidence
